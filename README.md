@@ -1,2 +1,2 @@
 # IBS-Todo-List
-Created with CodeSandbox
+A simple Todo-List
