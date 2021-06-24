@@ -74,6 +74,17 @@ body {
   font-weight: bold;
 }
 
+.changeModeButton {
+  margin-top: 10px;
+  border: none;
+  color: white;
+  padding: 5px;
+  background-color: #fd3672;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
 .header {
   display: flex;
   align-items: center;

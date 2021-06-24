@@ -55,16 +55,16 @@ function signup() {
   if (!signupState) {
     signupState = true;
     loginButton.value = "Signup";
-    loginText.classList.remove("loginButton");
+    loginText.classList.remove("changeModeButton");
     loginText.classList.add("signupButton");
     signupText.classList.remove("signupButton");
-    signupText.classList.add("loginButton");
+    signupText.classList.add("changeModeButton");
   } else {
     signupState = false;
     loginButton.value = "Login";
     loginText.classList.remove("signupButton");
-    loginText.classList.add("loginButton");
-    signupText.classList.remove("loginButton");
+    loginText.classList.add("changeModeButton");
+    signupText.classList.remove("changeModeButton");
     signupText.classList.add("signupButton");
   }
 }
