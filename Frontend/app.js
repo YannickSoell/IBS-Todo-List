@@ -23,6 +23,16 @@ window.onload = async function () {
   todoDateInput = document.getElementById("dateInput");
   todoTimeInput = document.getElementById("timeInput");
 
+  // set defaultdate to current day
+  let date = new Date();
+  let day = date.getDate();
+  let month = date.getMonth() + 1;
+  let year = date.getFullYear();
+  if (month < 10) month = "0" + month;
+  if (day < 10) day = "0" + day;
+  let today = year + "-" + month + "-" + day; 
+  todoDateInput.defaultValue = today;
+
   modal = document.getElementById("myModal");
   emailInput = document.getElementById("email");
   passwordInput = document.getElementById("password");
@@ -31,8 +41,6 @@ window.onload = async function () {
   signupText = document.getElementById("signupButtonText")
   document.getElementById("submitButton").addEventListener("click", addTodo);
   document.getElementById("loginButton").addEventListener("click", login);
-  //TODO:YANNICK FRAGEN??
-  //document.getElementById("dateInput").value = new Date().toDateInputValue();
 
   token = localStorage.getItem('authToken');
   if (token) {
@@ -147,6 +155,9 @@ async function submit() {
       time: response.data.time,
       complete: response.data.complete
     })
+
+    // make todo input value filed empty again after submitting todo
+    todoTextInput.value = "";
 
   } catch (error) {
     console.log(error)

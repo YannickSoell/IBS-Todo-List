@@ -108,6 +108,7 @@ body {
   color: #e6e6e6;
   border: none;
   margin: 10px;
+  margin-right: 0px;
   font-size: 18px;
   cursor: pointer;
   transition: all 0.5s ease;
@@ -243,6 +244,7 @@ body {
   color: #e6e6e6;
   border: none;
   margin: 10px;
+  margin-left: 0 px;
   font-size: 30px;
   cursor: pointer;
   transition: all 0.5s ease;
