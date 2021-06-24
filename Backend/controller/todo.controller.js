@@ -49,8 +49,15 @@ exports.checked = async (req, res) => {
 
 exports.delete = async (req, res) => {
     try {
+        let todoId = req.params.id;
+        await Todo.findByIdAndDelete(todoId, function (err, docs){
+            if(err){
 
-        res.status(200).send("")
+            }else{
+                console.log("Deleted Todo : ", docs)
+                res.status(200).send({ deletedTodo: docs});
+            }
+        });
     } catch (error) {
         res.status(400).send(error)
     }

@@ -2,7 +2,8 @@
 let todoTextInput;
 let todoDateInput;
 let todoTimeInput;
-
+let taskNum;
+let completeNum;
 //LOGIN
 let loginButton;
 let loginText;
@@ -16,13 +17,17 @@ let m;
 
 let API = "http://localhost:9998/api"
 let token;
+let tasksNum = 0;
+let completesNum = 0;
+
 window.onload = async function () {
   /* m = new mqtt_fetch("aabay");
   await m.init("localhost", 1884); // MQTT over websockets!! */
   todoTextInput = document.getElementById("todoInput");
   todoDateInput = document.getElementById("dateInput");
   todoTimeInput = document.getElementById("timeInput");
-
+  completeNum = document.getElementById("completeNum");
+  taskNum = document.getElementById("taskNum");
   // set defaultdate to current day
   let date = new Date();
   let day = date.getDate();
@@ -121,6 +126,8 @@ async function getAllTodos() {
     })
     console.log("GET ALL TODOS", response.data.todos)
     let todos = response.data.todos;
+    tasksNum = 0;
+    completesNum = 0;
     todos.forEach(todo => {
       makeTask({
         id: todo._id,
@@ -129,10 +136,21 @@ async function getAllTodos() {
         time: todo.time,
         complete: todo.complete
       })
+      if(todo.complete){
+        completesNum++;
+      }else{
+        tasksNum++;
+      }
     });
+    updateCounter();
   } catch (error) {
     console.log("GET ALL TODOS", error)
   }
+}
+
+function updateCounter(){
+  taskNum.innerHTML = tasksNum;
+  completeNum.innerHTML = completesNum;
 }
 
 async function submit() {
@@ -158,7 +176,8 @@ async function submit() {
 
     // make todo input value filed empty again after submitting todo
     todoTextInput.value = "";
-
+    tasksNum++;
+    updateCounter()
   } catch (error) {
     console.log(error)
   }
@@ -182,52 +201,63 @@ async function makeComplete(id) {
     document.getElementById("tasksWrapper").removeChild(todoWrapper);
     let compWrapper = document.getElementById("completeWrapper");
     compWrapper.insertBefore(todoWrapper, compWrapper.firstChild.nextSibling.nextSibling);
+    
+    tasksNum--;
+    completesNum++;
+    updateCounter()
   } catch (error) {
-
+    console.log("make complete ", error)
   }
 }
 
-function makeUncomplete(id) {
+async function makeUncomplete(id) {
   console.log("ucom", id)
   try {
-    // const response = await axios.put(`${API}/todo/${id}`, {
-    //   complete: true,
-    // }, {
-    //   headers: {
-    //     "Authorization": "Bearer " + token,
-    //   },
-    // })
-    // console.log(response);
+    const response = await axios.put(`${API}/todo/${id}`, {
+      complete: false,
+    }, {
+      headers: {
+        "Authorization": "Bearer " + token,
+      },
+    })
+    console.log(response);
 
     // switch list to done
     let todoWrapper = document.getElementById(`taskCheckbox-${id}`).parentElement;
     document.getElementById("completeWrapper").removeChild(todoWrapper);
     document.getElementById("tasksWrapper").appendChild(todoWrapper);
-
+    
+    tasksNum++;
+    completesNum--;
+    updateCounter()
   } catch (error) {
-
+    console.log("make uncomplete ", error)
   }
 }
 
 
-function deleteToDo(id) {
+async function deleteToDo(id) {
   console.log("del", id);
   try {
-    // const response = await axios.delete(`${API}/todo/${id}`);//, {
-    //   complete: true,
-    // }, {
-    //   headers: {
-    //     "Authorization": "Bearer " + token,
-    //   },
-    // })
-    // console.log(response);
-    // document.getElementById(`taskCheckbox-${toDoElementId}`)
-
+    const response = await axios.delete(`${API}/todo/${id}`, 
+    { 
+        headers: {
+          "Authorization": "Bearer " + token,
+        }
+    });
+  
+    //console.log(response)
     // delete view
     let todoWrapper = document.getElementById(`taskCheckbox-${id}`).parentElement;
     todoWrapper.parentElement.removeChild(todoWrapper);
+    if(response.data && response.data.deletedTodo.complete){
+      completesNum--;
+    }else{
+      tasksNum--;
+    }
+    updateCounter()
   } catch (error) {
-
+    console.log("delete ", error)
   }
 }
 
@@ -262,7 +292,7 @@ function makeTask(data) {
 
   // label to show todo item task
   let text = document.createElement("label");
-  text.classList.add(data.complete ? "taskText taskChecked" : "taskText");
+  text.classList.add(data.complete ? "taskText"+"taskChecked" : "taskText");
   text.id = `taskCheckbox`;
   text.htmlFor = `taskCheckbox-${toDoElementId}`;
   text.innerHTML = data.text;
@@ -279,7 +309,7 @@ function makeTask(data) {
   time.classList.add("taskTime");
 
   let dateDisplay = data.date.split("-")
-  date.innerHTML = `📆 ${dateDisplay[2]}.${dateDisplay[1]}.${dateDisplay[0]} `;
+  date.innerHTML = `📆 ${dateDisplay[2]}.${dateDisplay[1]}.${dateDisplay[0]}`;
   time.innerHTML = "🕐 " + data.time;
 
   dateTime.appendChild(date);
