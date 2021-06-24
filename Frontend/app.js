@@ -12,6 +12,8 @@ let modal;
 //MQTT
 let m;
 
+let API = "http://localhost:9998/api"
+
 window.onload = async function () {
   /* m = new mqtt_fetch("aabay");
   await m.init("localhost", 1884); // MQTT over websockets!! */
@@ -25,6 +27,12 @@ window.onload = async function () {
   loginButton = document.getElementById("loginButton");
   document.getElementById("submitButton").addEventListener("click", addTodo);
   document.getElementById("loginButton").addEventListener("click", login);
+
+  let token = localStorage.getItem('authToken');
+  if(token){
+    modal.style.display = "none"
+  }
+
 };
 
 function addTodo(e) {
@@ -36,6 +44,7 @@ function addTodo(e) {
 }
 
 function signup() {
+  console.log("hello")
   if (!signupState) {
     signupState = true;
     loginButton.value = "Signup";
@@ -46,14 +55,24 @@ function signup() {
 }
 
 async function login(e) {
-  const user = {
-    email: emailInput.value,
-    password: passwordInput.value
-  };
-  console.log(user, signupState);
   //HIER ANFRAGE SCHICKEN ZUM EINLOGGEN UND WENN ERFOLGREICH STYLE NONE
-  modal.style.display = "none";
-
+  let res;
+  if(signupState){
+    res = await axios.post(`${API}/register`, {
+      email: emailInput.value,
+      password: passwordInput.value
+    })
+  }else{
+    res = await axios.post(`${API}/login`, {
+      email: emailInput.value,
+      password: passwordInput.value
+    })
+  }
+  console.log(res.data.token)
+  if(res.data.token && res.data.token.length > 0){
+    localStorage.setItem('authToken', res.data.token);
+    modal.style.display = "none";
+  }
   e.preventDefault();
 }
 
