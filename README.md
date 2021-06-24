@@ -10,6 +10,8 @@ A simple Todo-List
 - [x] Logout Button
 - [x] Todos mit JS
 - [ ] Delete Todo
+- [ ] Auth check if valid
+- [ ] SignUp Name -> als Ueberschrift Liste
  
 ### Backend
 - [x] Config

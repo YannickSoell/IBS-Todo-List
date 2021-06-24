@@ -165,16 +165,60 @@ async function makeComplete(id) {
       },
     })
     console.log(response);
-    document.getElementById(`taskCheckbox-${checkboxID}`)
+
+    // switch list to done
+    let todoWrapper = document.getElementById(`taskCheckbox-${id}`).parentElement;
+    document.getElementById("tasksWrapper").removeChild(todoWrapper);
+    let compWrapper = document.getElementById("completeWrapper");
+    compWrapper.insertBefore(todoWrapper, compWrapper.firstChild.nextSibling.nextSibling);
   } catch (error) {
 
   }
 }
 
-function makeUncomplete(e) {
-  console.log("ucom", e)
+function makeUncomplete(id) {
+  console.log("ucom", id)
+  try {
+    // const response = await axios.put(`${API}/todo/${id}`, {
+    //   complete: true,
+    // }, {
+    //   headers: {
+    //     "Authorization": "Bearer " + token,
+    //   },
+    // })
+    // console.log(response);
+
+    // switch list to done
+    let todoWrapper = document.getElementById(`taskCheckbox-${id}`).parentElement;
+    document.getElementById("completeWrapper").removeChild(todoWrapper);
+    document.getElementById("tasksWrapper").appendChild(todoWrapper);
+
+  } catch (error) {
+
+  }
 }
 
+
+function deleteToDo(id) {
+  console.log("del", id);
+  try {
+    // const response = await axios.delete(`${API}/todo/${id}`);//, {
+    //   complete: true,
+    // }, {
+    //   headers: {
+    //     "Authorization": "Bearer " + token,
+    //   },
+    // })
+    // console.log(response);
+    // document.getElementById(`taskCheckbox-${toDoElementId}`)
+
+    // delete view
+    let todoWrapper = document.getElementById(`taskCheckbox-${id}`).parentElement;
+    todoWrapper.parentElement.removeChild(todoWrapper);
+  } catch (error) {
+
+  }
+}
 
 // dynamically create task to be shown in one of the both lists
 function makeTask(data) {
@@ -189,12 +233,12 @@ function makeTask(data) {
   taskWrapper.id = "task";
 
   // checkbox for setting todo item done / unsetting ...
-  let checkboxID = data.id;
+  let toDoElementId = data.id;
   let checkbox = document.createElement("input");
   checkbox.type = "checkbox";
   checkbox.classList.add("taskCheckbox");
-  checkbox.id = `taskCheckbox-${checkboxID}`;
-  checkbox.name = `taskCheckbox-${checkboxID}`;
+  checkbox.id = `taskCheckbox-${toDoElementId}`;
+  checkbox.name = `taskCheckbox-${toDoElementId}`;
   checkbox.checked = data.complete ? true : false;
   checkbox.addEventListener('change', function () {
     if (this.checked) {
@@ -209,10 +253,11 @@ function makeTask(data) {
   let text = document.createElement("label");
   text.classList.add(data.complete ? "taskText taskChecked" : "taskText");
   text.id = `taskCheckbox`;
-  text.htmlFor = `taskCheckbox-${checkboxID}`;
+  text.htmlFor = `taskCheckbox-${toDoElementId}`;
   text.innerHTML = data.text;
 
 
+  // dateTime to show date and time, made from date and time fields
   let dateTime = document.createElement("div");
   dateTime.classList.add("taskDateTime");
 
@@ -230,10 +275,20 @@ function makeTask(data) {
   dateTime.appendChild(time);
 
 
+  // delete-button
+  let deleteButton = document.createElement("button");
+  deleteButton.classList.add("deleteButton");
+  deleteButton.innerHTML = "❌";
+  deleteButton.onclick = () => {
+    deleteToDo(data.id);
+  };
+
+
   // add created elements 
   taskWrapper.appendChild(checkbox);
   taskWrapper.appendChild(text);
   taskWrapper.appendChild(dateTime);
+  taskWrapper.appendChild(deleteButton);
 
   if (data.complete) {
     completeTaskWrapper.appendChild(taskWrapper);
