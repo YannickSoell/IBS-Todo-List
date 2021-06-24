@@ -17,11 +17,11 @@ const todoSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  complete:{
+  complete: {
     type: Boolean,
     default: false,
     required: true
   }
-});
+}, { timestamps: { createdAt: 'created_at' } });
 
 mongoose.model(`Todo`, todoSchema);

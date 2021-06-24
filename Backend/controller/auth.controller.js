@@ -12,7 +12,7 @@ exports.register = async (req, res) => {
 
     res.send({ token });
   } catch (err) {
-    return res.status(422).send(err.message);
+    return res.status(422).send({ error: err.message });
   }
 };
 

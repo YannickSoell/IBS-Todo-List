@@ -7,6 +7,7 @@ body {
   margin: 0vw 20vw;
 }
 
+
 /* The Modal (background) */
 .modal {
   position: fixed; /* Stay in place */
@@ -15,7 +16,8 @@ body {
   top: 0;
   width: 100%; /* Full width */
   height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
+  height: 100%;
+  overflow: hidden;
   background-color: #17181f;
   background-color: rgba(0, 0, 0); /* Black w/ opacity */
   z-index: 10;
@@ -28,8 +30,11 @@ body {
   padding: 25px;
   padding-bottom: 28px;
   border: none;
-  width: 80%; /* Could be more or less, depending on screen size */
+  width: 50%; /* Could be more or less, depending on screen size */
   border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .loginForm {
   display: flex;
@@ -37,7 +42,7 @@ body {
   width: 70%;
 }
 .loginInput {
-  border: solid 1px #4b4f66;
+  border: solid 3px #4b4f66;
   color: white;
   padding: 8px;
   background-color: transparent;
@@ -59,17 +64,49 @@ body {
   padding: 5px;
   background-color: #fd3672;
   border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.loginButton:hover {
+  background-color: #ff135a;
+  transform: scale(1.05);
+  font-weight: bold;
 }
 
 .header {
   display: flex;
   align-items: center;
-  justify-content: left;
+  justify-content: space-between;
 }
 
 .addWrapper {
   display: flex;
   flex-direction: row;
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 35px;
+  border-radius: 12px;
+  align-self: flex-start;
+  padding: 5px;
+  background-color: #fa78a2;
+  color: #e6e6e6;
+  border: none;
+  margin: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.5s ease;
+  align-self: center;
+}
+
+.logoutButton:hover {
+  background-color: #fd3672;
+  transform: scale(1.1);
 }
 
 .todoInput {
@@ -221,6 +258,9 @@ body {
   margin: 16px 0px;
   font-size: 20px;
   font-weight: bold;
+}
+.taskNum{
+  margin-left: 5px;
 }
 .completeWrapper {
   display: flex;

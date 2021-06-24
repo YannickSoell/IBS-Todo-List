@@ -6,17 +6,20 @@ A simple Todo-List
 - [x] Config
 - [x] Auth
 - [x] Designen und implementieren
-- [ ] Signup und Login Button ändern
-- [ ] Logout Button
-- [ ] Todos mit JS
+- [x] Signup und Login Button ändern
+- [x] Logout Button
+- [x] Todos mit JS
+- [ ] Delete Todo
  
 ### Backend
 - [x] Config
 - [x] mongoose schema
 - [x] Auth Route
-- [ ] Todo Route
-    - [ ] GET alle Todos
-    - [ ] POST Todo
+- [x] Todo Route
+    - [x] GET alle Todos
+    - [x] POST Todo
+    - [ ] PUT Todo
+    - [ ] DELETE Todo
 - [ ] POST Todo mit Alexa
 - [ ] MQTT 
 - [ ] Pushetta

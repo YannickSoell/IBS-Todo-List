@@ -6,11 +6,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true,
     required: true,
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+
   },
   password: {
     type: String,
     required: true,
-  },
+  }
 });
 
 userSchema.pre("save", function (next) {
