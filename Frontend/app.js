@@ -2,8 +2,11 @@
 let todoTextInput;
 let todoDateInput;
 let todoTimeInput;
+
+//COUNTERFIELDS FOR TODOS
 let taskNum;
 let completeNum;
+
 //LOGIN
 let loginButton;
 let loginText;
@@ -247,7 +250,7 @@ async function deleteToDo(id) {
         }
     });
   
-    //console.log(response)
+    console.log(response)
     // delete view
     let todoWrapper = document.getElementById(`taskCheckbox-${id}`).parentElement;
     todoWrapper.parentElement.removeChild(todoWrapper);
