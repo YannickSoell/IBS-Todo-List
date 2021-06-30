@@ -34,7 +34,10 @@ npm install
   - [x] DELETE Todo
 - [ ] POST Todo mit Alexa
 - [ ] MQTT
-- [ ] Pushetta
+- [ ] Email Notification
+  - [x] Nodemailer with Gmail service
+  - [ ] template
+  - [x] Timerinterval for everyday
 
 ### Alexa-Skill
 

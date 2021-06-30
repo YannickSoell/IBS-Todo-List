@@ -108,6 +108,7 @@ async function login(e) {
     if (res.data.token && res.data.token.length > 0) {
       localStorage.setItem('authToken', res.data.token);
       modal.style.display = "none";
+      location.reload();
     }
   } catch (error) {
     console.log("Error login", error)

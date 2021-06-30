@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const authRoute = require("./route/authRoute");
 const todoRoute = require("./route/todoRoute");
-
+const notifyUser = require("./utils/notifyUser");
 const app = express();
 
 app.use(cors());
@@ -25,6 +25,7 @@ mongoose.connect(mongoUri, {
 
 mongoose.connection.on("connected", () => {
   console.log("connected to mongo instance ");
+  notifyUser()  
 });
 mongoose.connection.on("error", (err) => {
   console.error("Error connected to mongo", err);
