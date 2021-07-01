@@ -95,7 +95,7 @@ function onMessage(topic, message) {
     intent = alexaOBJ.request.intent.name;
     if (intent == "gettodo") {
       userSession.zustand = 1;
-    } else if ((intent = "maketodo")) {
+    } else if (intent == "maketodo") {
       userSession.zustand = 2;
     }
     //intentsNummer = intents.indexOf(intentName);
@@ -146,12 +146,6 @@ function onMessage(topic, message) {
       break;
   }
 
-  if (flag) {
-    cache.del(sessionId);
-  } else {
-    cache.put(sessionId, userSession);
-  }
-
   /* responseNummer:
 					0 ist Launchreq
 					1 ist intents gettodo
@@ -167,10 +161,16 @@ function onMessage(topic, message) {
     `Was möchtest du erledigen?`,
     `Ok. An welchem Tag möchtest du das machen?`,
     `Alles klar. Und um wie viel Uhr?`,
-    `Ist eingetragen!`,
+    `${userSession.todoText} am ${userSession.todoDate} um ${userSession.todoTime} ist eingetragen!`,
   ];
 
   responseText = responses[responseNummer];
+
+  if (flag) {
+    cache.del(sessionId);
+  } else {
+    cache.put(sessionId, userSession);
+  }
 
   // Response
   var response = {
