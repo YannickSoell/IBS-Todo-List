@@ -1,0 +1,80 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "todo list",
+            "intents": [
+                {
+                    "name": "gettodo",
+                    "slots": [],
+                    "samples": [
+                        "die heute fälligen todos vorlesen"
+                    ]
+                },
+                {
+                    "name": "maketodo",
+                    "slots": [],
+                    "samples": [
+                        "ein neues todo erstellen"
+                    ]
+                },
+                {
+                    "name": "todotext",
+                    "slots": [
+                        {
+                            "name": "text",
+                            "type": "AMAZON.SearchQuery"
+                        }
+                    ],
+                    "samples": [
+                        "ich möchte {text}"
+                    ]
+                },
+                {
+                    "name": "tododate",
+                    "slots": [
+                        {
+                            "name": "date",
+                            "type": "AMAZON.DATE"
+                        }
+                    ],
+                    "samples": [
+                        "Am {date}"
+                    ]
+                },
+                {
+                    "name": "todotime",
+                    "slots": [
+                        {
+                            "name": "time",
+                            "type": "AMAZON.TIME"
+                        }
+                    ],
+                    "samples": [
+                        "Um {time}"
+                    ]
+                },
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                }
+            ],
+            "types": []
+        }
+    }
+}
