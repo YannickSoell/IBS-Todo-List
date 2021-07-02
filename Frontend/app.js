@@ -21,8 +21,7 @@ let tasksNum = 0;
 let completesNum = 0;
 
 window.onload = async function () {
-  /* m = new mqtt_fetch("aabay");
-  await m.init("localhost", 1884); // MQTT over websockets!! */
+  
   todoTextInput = document.getElementById("todoInput");
   todoDateInput = document.getElementById("dateInput");
   todoTimeInput = document.getElementById("timeInput");
@@ -50,7 +49,9 @@ window.onload = async function () {
   token = localStorage.getItem('authToken');
   if (token) {
     modal.style.display = "none"
-    console.log(token)
+    console.log("Auth BEARER TOKEN : ", token)
+    m = new mqtt_fetch("alexa2mqtt");
+    await m.init("www.ostalbradar.de", 8883); // MQTT over websockets!!
     getAllTodos();
   }
 };
