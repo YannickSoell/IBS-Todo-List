@@ -14,6 +14,7 @@ A simple Todo-List
 - [x] Auth check if valid
 - [x] Tasks and Completed Counters
 - [ ] SignUp Name -> als Ueberschrift Liste
+- [ ] Connect with MQTT
 
 ### Backend
 
