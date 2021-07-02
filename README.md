@@ -33,7 +33,7 @@ npm install
   - [x] PUT Todo
   - [x] DELETE Todo
 - [ ] POST Todo mit Alexa
-- [ ] MQTT
+- [x] MQTT
 - [ ] Email Notification
   - [x] Nodemailer with Gmail service
   - [ ] template
@@ -41,4 +41,5 @@ npm install
 
 ### Alexa-Skill
 
-- [ ] intents
+- [x] intents
+- [ ] Auth with Alexa
