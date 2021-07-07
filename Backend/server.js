@@ -16,6 +16,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api", authRoute);
 app.use("/api/todo", todoRoute);
 
+app.set("view engine", "pug");
+app.set("views", "./views");
+
 const mongoUri =
   "mongodb+srv://admin:admin@cluster0.cb42i.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 mongoose.connect(mongoUri, {

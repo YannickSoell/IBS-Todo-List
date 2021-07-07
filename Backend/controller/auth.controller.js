@@ -33,3 +33,14 @@ exports.login = async (req, res) => {
     return res.status(422).send({ error: "Invalid Password or Email" });
   }
 };
+
+exports.oauthRender = async (req, res) => {
+  res.render("oauthform");
+};
+//https://3b0e7f286fb5.ngrok.io
+exports.oauthLogin = async (req, res) => {
+  const { username, password } = req.body;
+  console.log(username, password);
+
+  res.send(username);
+};

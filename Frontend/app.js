@@ -49,18 +49,39 @@ window.onload = async function () {
   if (token) {
     modal.style.display = "none";
     console.log("Auth BEARER TOKEN : ", token);
-    m = new mqtt_fetch("alexa2mqtt");
+    m = new mqtt_fetch("todo");
     //https://www.ostalbradar.de/node/alexa2mqtt.js?user=6447
 
-    await m.init("www.ostalbradar.de", 8883); // MQTT over websockets!!
+    await m.init("localhost", 1884); // MQTT over websockets!!
+    m.set_callback(-1, mqttTodo, false);
+
     getAllTodos();
   }
 };
 
+function mqttTodo(data) {
+  let jsondata = JSON.parse(data);
+  console.log("mqttTodo ", jsondata);
+
+  makeTask({
+    id: jsondata._id,
+    text: jsondata.text,
+    date: jsondata.datum,
+    time: jsondata.time,
+    complete: jsondata.complete,
+  });
+  if (jsondata.complete) {
+    completesNum++;
+  } else {
+    tasksNum++;
+  }
+  updateCounter();
+}
+
 function addTodo(e) {
-  console.log(todoTextInput.value);
-  console.log(todoDateInput.value);
-  console.log(todoTimeInput.value);
+  // console.log(todoTextInput.value);
+  // console.log(todoDateInput.value);
+  // console.log(todoTimeInput.value);
 
   e.preventDefault();
 }
@@ -103,7 +124,7 @@ async function login(e) {
         password: passwordInput.value,
       });
     }
-    console.log(res.data.token);
+    //console.log(res.data.token);
     if (res.data.token && res.data.token.length > 0) {
       localStorage.setItem("authToken", res.data.token);
       modal.style.display = "none";
@@ -167,7 +188,7 @@ async function submit() {
         },
       }
     );
-    console.log(response);
+    //console.log(response);
 
     makeTask({
       id: response.data._id,
@@ -187,7 +208,7 @@ async function submit() {
 }
 
 async function makeComplete(id) {
-  console.log("com", id);
+  //console.log("com", id);
   try {
     const response = await axios.put(
       `${API}/todo/${id}`,
@@ -200,7 +221,7 @@ async function makeComplete(id) {
         },
       }
     );
-    console.log(response);
+    //console.log(response);
 
     // switch list to done
     let todoWrapper = document.getElementById(
@@ -222,7 +243,7 @@ async function makeComplete(id) {
 }
 
 async function makeUncomplete(id) {
-  console.log("ucom", id);
+  //console.log("ucom", id);
   try {
     const response = await axios.put(
       `${API}/todo/${id}`,
@@ -235,7 +256,7 @@ async function makeUncomplete(id) {
         },
       }
     );
-    console.log(response);
+    //console.log(response);
 
     // switch list to done
     let todoWrapper = document.getElementById(
@@ -253,7 +274,7 @@ async function makeUncomplete(id) {
 }
 
 async function deleteToDo(id) {
-  console.log("del", id);
+  //console.log("del", id);
   try {
     const response = await axios.delete(`${API}/todo/${id}`, {
       headers: {
@@ -307,7 +328,12 @@ function makeTask(data) {
 
   // label to show todo item task
   let text = document.createElement("label");
-  text.classList.add(data.complete ? "taskText" + "taskChecked" : "taskText");
+  //console.log("data.complete", data.complete);
+  if (data.complete) {
+    text.classList.add("taskText", "taskChecked");
+  } else {
+    text.classList.add("taskText");
+  }
   text.id = `taskCheckbox`;
   text.htmlFor = `taskCheckbox-${toDoElementId}`;
   text.innerHTML = data.text;

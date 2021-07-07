@@ -1,8 +1,8 @@
 /*
  Version 20200107
- 
- ToDo:
- */
+ Author: Prof. Dr. Winfried Bantel
+*/
+
 class mqtt_fetch {
   constructor(prefix) {
     this.prefix = "mqttfetch/" + prefix + "/";
@@ -31,11 +31,16 @@ class mqtt_fetch {
         resolve(-1);
       };
 
-      connect_prm.userName = "6447";
-      connect_prm.password = "RPo6zINUyveBhOrQ0gFmT9Yvrp0";
+      /*connect_prm.userName = "6447";
+      connect_prm.password = "RPo6zINUyveBhOrQ0gFmT9Yvrp0"; */
 
       console.log(connect_prm);
-      that.mqtt_client = new Paho.MQTT.Client(host, port, uri, "userid=6447");
+      that.mqtt_client = new Paho.MQTT.Client(
+        host,
+        port,
+        uri,
+        "token-" + localStorage.getItem("authToken")
+      );
       that.mqtt_client.onMessageArrived = function (msg) {
         that.mqtt_fetch_rx(msg, that);
       };
@@ -166,81 +171,3 @@ class mqtt_fetch {
     return rc;
   }
 }
-
-/*
- var mqtt_topicIndex = 0;
- var mqtt_topicMap = new Map;
- var mqtt;
-
- 
-function mqtt_fetch_init(host, port, uri, connect_prm) {
-	return new Promise(function(resolve) {
-		//ccallback = resolve; // Alt, globale Variable
-		var prm = {onMessageArrived:  mqtt_fetch_rx};
-		if (connect_prm == null) {
-			connect_prm = {};
-		}
-		connect_prm.onSuccess = function() {
-			console.log("mqtt_fetch_onConnect");
-			var topic = "client/" +  mqtt.clientId + "/to/+";
-			mqtt.subscribe(topic, {
-				onSuccess: function () {console.log("mqtt_fetch_subscription_ok"); resolve(0);},
-				onFailure: function () {console.log("mqtt_fetch_subscription_err"); resolve(-2);}
-			});
-		};
-		connect_prm.onFailure = function() {console.log("mqtt_connect_err"); resolve(-1);};
-		mqtt = mqtt_connect(host, port, uri, prm, connect_prm);
-	});
-}
-
-function mqtt_fetch_tx(v) {
-	return new Promise(function(resolve) {
-		var message = new Paho.MQTT.Message(v);
-		message.destinationName = "client/"+ mqtt.clientId + "/from/" + mqtt_topicIndex;
-		mqtt_topicMap.set(mqtt_topicIndex, [resolve,setTimeout(mqtt_fetch_error, 1000, mqtt_topicIndex)]);
-		mqtt.send(message);
-		mqtt_topicIndex++;
-	});
-}
- 
-function mqtt_fetch_error(nr) {
-	console.log("error: " + nr);
-	if (mqtt_topicMap.has(nr))
-		mqtt_topicMap.delete(nr);
-	if (mqtt_error != undefined)
-		mqtt_error(nr);
-}
-
-
-function mqtt_fetch_onConnect() {
-	console.log("mqtt_fetch_onConnect");
-	var topic = "client/" +  mqtt.clientId + "/to/+";
-	mqtt.subscribe(topic, {
-	onSuccess: mqtt_fetch_subscription_ok,
-	onFailure: subscribe_onFailure
-	});
-}
-
-function mqtt_fetch_subscription_ok() {
-	console.log("mqtt_fetch_subscription_ok");
-	console.log(ccallback);
-	ccallback();
-	ccallback = null;
-}
-
-function mqtt_fetch_rx (msg) {
-	var topic = msg.destinationName.split("/");
-	if (topic[0] == "client") {
-		var nr=+topic[3], dummy = mqtt_topicMap.get(nr);
-		if (dummy != undefined) {
-			if (nr >= 0)
-				clearTimeout(dummy[1]);
-			mqtt_topicMap.delete(nr);
-			dummy[0](msg.payloadString);
-		}
-	}
-	else { // ToDo: Wildcards einbauen!
-		if (mqtt_topicMap.has(msg.destinationName))
-			mqtt_topicMap.get(msg.destinationName)(msg);
-	}
-}*/
