@@ -5,6 +5,8 @@ const router = express.Router();
 router.post("/register", controller.register);
 router.post("/login", controller.login);
 router.get("/oauth", controller.oauthRender);
-router.post("/oauth/login", controller.oauthLogin);
+router.post("/oauth/code", controller.oauthLogin);
+//fehler
+router.get("/oauth/accesstoken", controller.oauthAccessToken);
 
 module.exports = router;

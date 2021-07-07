@@ -1,9 +1,13 @@
 require("./models/User");
 require("./models/Todo");
+require("./models/Code");
+
 //const fcgi = require('node-fastcgi');
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const path = require("path");
+
 const authRoute = require("./route/authRoute");
 const todoRoute = require("./route/todoRoute");
 const notifyUser = require("./utils/notifyUser");
@@ -16,6 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api", authRoute);
 app.use("/api/todo", todoRoute);
 
+app.use(express.static("public"));
 app.set("view engine", "pug");
 app.set("views", "./views");
 

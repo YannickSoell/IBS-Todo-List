@@ -1,15 +1,28 @@
 html
     head 
+        script(src="/oauth2-implicit-grant.js")
     body
         h1 Todo Login
-        form(method="POST" action="/api/oauth/login")
+        table
+            tr
+                th Email:
+                td
+                    input#email
+            tr
+                th Pass:
+                td
+                    input#pass
+        button#submit Verknüpfen
 
-            //-input email
-            label( for="inputEmail") Email address
-            input(type="email" name="username" id="inputEmail" placeholder="Email address" required autofocus)
+        //- form(method="POST" action="/api/oauth/login")
 
-            //-input password
-            label(for="inputPassword") Password
-            input(type="password" name="password" id="inputPassword" placeholder="Password" required)
+        //-     //-input email
+        //-     label( for="inputEmail") Email address
+        //-     input(type="email" name="username" id="inputEmail" placeholder="Email address" required autofocus)
 
-            input(type='submit', value='Submit')
+        //-     //-input password
+        //-     label(for="inputPassword") Password
+        //-     input(type="password" name="password" id="inputPassword" placeholder="Password" required)
+
+        //-     input(type='submit', value='Submit')
+
