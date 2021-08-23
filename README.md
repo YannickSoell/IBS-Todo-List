@@ -13,7 +13,8 @@ A simple Todo-List
 - [x] Delete Todo
 - [x] Auth check if valid
 - [x] Tasks and Completed Counters
-- [ ] SignUp Name -> als Ueberschrift Liste
+- [x] Connect with MQTT
+- [x] POST Todo mit Alexa
 
 ### Backend
 
@@ -32,13 +33,17 @@ npm install
   - [x] POST Todo
   - [x] PUT Todo
   - [x] DELETE Todo
-- [ ] POST Todo mit Alexa
-- [ ] MQTT
+- [x] MQTT
 - [ ] Email Notification
   - [x] Nodemailer with Gmail service
-  - [ ] template
   - [x] Timerinterval for everyday
+  - [ ] template
+  - [ ] Email einkommentieren
+- [x] start own mqtt server for frontend
+- [x] POST Todo mit Alexa
 
 ### Alexa-Skill
 
-- [ ] intents
+- [x] intents
+- [ ] Auth with Alexa
+- [ ] heutige todos: ist oder sind mit und beim letzen | Text verbessern...

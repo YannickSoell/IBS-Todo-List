@@ -18,14 +18,12 @@ let modal;
 //MQTT
 let m;
 
-let API = "http://localhost:9998/api"
+let API = "http://localhost:9998/api";
 let token;
 let tasksNum = 0;
 let completesNum = 0;
 
 window.onload = async function () {
-  /* m = new mqtt_fetch("aabay");
-  await m.init("localhost", 1884); // MQTT over websockets!! */
   todoTextInput = document.getElementById("todoInput");
   todoDateInput = document.getElementById("dateInput");
   todoTimeInput = document.getElementById("timeInput");
@@ -38,31 +36,55 @@ window.onload = async function () {
   let year = date.getFullYear();
   if (month < 10) month = "0" + month;
   if (day < 10) day = "0" + day;
-  let today = year + "-" + month + "-" + day; 
+  let today = year + "-" + month + "-" + day;
   todoDateInput.defaultValue = today;
 
   modal = document.getElementById("myModal");
   emailInput = document.getElementById("email");
   passwordInput = document.getElementById("password");
   loginButton = document.getElementById("loginButton");
-  loginText = document.getElementById("loginButtonText")
-  signupText = document.getElementById("signupButtonText")
+  loginText = document.getElementById("loginButtonText");
+  signupText = document.getElementById("signupButtonText");
   document.getElementById("submitButton").addEventListener("click", addTodo);
   document.getElementById("loginButton").addEventListener("click", login);
 
-  token = localStorage.getItem('authToken');
+  token = localStorage.getItem("authToken");
   if (token) {
-    modal.style.display = "none"
-    console.log(token)
+    modal.style.display = "none";
+    console.log("Auth BEARER TOKEN : ", token);
+    m = new mqtt_fetch("todo");
+    //https://www.ostalbradar.de/node/alexa2mqtt.js?user=6447
+
+    await m.init("localhost", 1884); // MQTT over websockets!!
+    m.set_callback(-1, mqttTodo, false);
+
     getAllTodos();
   }
 };
 
+function mqttTodo(data) {
+  let jsondata = JSON.parse(data);
+  console.log("mqttTodo ", jsondata);
+
+  makeTask({
+    id: jsondata._id,
+    text: jsondata.text,
+    date: jsondata.datum,
+    time: jsondata.time,
+    complete: jsondata.complete,
+  });
+  if (jsondata.complete) {
+    completesNum++;
+  } else {
+    tasksNum++;
+  }
+  updateCounter();
+}
 
 function addTodo(e) {
-  console.log(todoTextInput.value);
-  console.log(todoDateInput.value);
-  console.log(todoTimeInput.value);
+  // console.log(todoTextInput.value);
+  // console.log(todoDateInput.value);
+  // console.log(todoTimeInput.value);
 
   e.preventDefault();
 }
@@ -85,12 +107,10 @@ function signup() {
   }
 }
 
-
 function logout() {
-  localStorage.removeItem('authToken');
+  localStorage.removeItem("authToken");
   location.reload();
 }
-
 
 async function login(e) {
   //HIER ANFRAGE SCHICKEN ZUM EINLOGGEN UND WENN ERFOLGREICH STYLE NONE
@@ -99,178 +119,196 @@ async function login(e) {
     if (signupState) {
       res = await axios.post(`${API}/register`, {
         email: emailInput.value,
-        password: passwordInput.value
-      })
+        password: passwordInput.value,
+      });
     } else {
       res = await axios.post(`${API}/login`, {
         email: emailInput.value,
-        password: passwordInput.value
-      })
+        password: passwordInput.value,
+      });
     }
-    console.log(res.data.token)
+    //console.log(res.data.token);
     if (res.data.token && res.data.token.length > 0) {
-      localStorage.setItem('authToken', res.data.token);
+      localStorage.setItem("authToken", res.data.token);
       modal.style.display = "none";
       location.reload();
     }
   } catch (error) {
-    console.log("Error login", error)
+    console.log("Error login", error);
   }
 
   e.preventDefault();
 }
 
-
 async function getAllTodos() {
   try {
     const response = await axios.get(`${API}/todo`, {
       headers: {
-        "Authorization": "Bearer " + token,
+        Authorization: "Bearer " + token,
       },
-    })
-    console.log("GET ALL TODOS", response.data.todos)
+    });
+    console.log("GET ALL TODOS", response.data.todos);
     let todos = response.data.todos;
     tasksNum = 0;
     completesNum = 0;
-    todos.forEach(todo => {
+    todos.forEach((todo) => {
       makeTask({
         id: todo._id,
         text: todo.text,
         date: todo.datum,
         time: todo.time,
-        complete: todo.complete
-      })
-      if(todo.complete){
+        complete: todo.complete,
+      });
+      if (todo.complete) {
         completesNum++;
-      }else{
+      } else {
         tasksNum++;
       }
     });
     updateCounter();
   } catch (error) {
-    console.log("GET ALL TODOS", error)
+    console.log("GET ALL TODOS", error);
   }
 }
 
-function updateCounter(){
+function updateCounter() {
   taskNum.innerHTML = tasksNum;
   completeNum.innerHTML = completesNum;
 }
 
 async function submit() {
   try {
-    const response = await axios.post(`${API}/todo`, {
-      text: todoTextInput.value,
-      datum: todoDateInput.value,
-      time: todoTimeInput.value
-    }, {
-      headers: {
-        "Authorization": "Bearer " + token,
+    const response = await axios.post(
+      `${API}/todo`,
+      {
+        text: todoTextInput.value,
+        datum: todoDateInput.value,
+        time: todoTimeInput.value,
       },
-    })
-    console.log(response);
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+    //console.log(response);
 
     makeTask({
       id: response.data._id,
       text: response.data.text,
       date: response.data.datum,
       time: response.data.time,
-      complete: response.data.complete
-    })
+      complete: response.data.complete,
+    });
 
     // make todo input value filed empty again after submitting todo
     todoTextInput.value = "";
     tasksNum++;
-    updateCounter()
+    updateCounter();
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
 
-
 async function makeComplete(id) {
-  console.log("com", id)
+  //console.log("com", id);
   try {
-    const response = await axios.put(`${API}/todo/${id}`, {
-      complete: true,
-    }, {
-      headers: {
-        "Authorization": "Bearer " + token,
+    const response = await axios.put(
+      `${API}/todo/${id}`,
+      {
+        complete: true,
       },
-    })
-    console.log(response);
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+    //console.log(response);
 
     // switch list to done
-    let todoWrapper = document.getElementById(`taskCheckbox-${id}`).parentElement;
+    let todoWrapper = document.getElementById(
+      `taskCheckbox-${id}`
+    ).parentElement;
     document.getElementById("tasksWrapper").removeChild(todoWrapper);
     let compWrapper = document.getElementById("completeWrapper");
-    compWrapper.insertBefore(todoWrapper, compWrapper.firstChild.nextSibling.nextSibling);
-    
+    compWrapper.insertBefore(
+      todoWrapper,
+      compWrapper.firstChild.nextSibling.nextSibling
+    );
+
     tasksNum--;
     completesNum++;
-    updateCounter()
+    updateCounter();
   } catch (error) {
-    console.log("make complete ", error)
+    console.log("make complete ", error);
   }
 }
 
 async function makeUncomplete(id) {
-  console.log("ucom", id)
+  //console.log("ucom", id);
   try {
-    const response = await axios.put(`${API}/todo/${id}`, {
-      complete: false,
-    }, {
-      headers: {
-        "Authorization": "Bearer " + token,
+    const response = await axios.put(
+      `${API}/todo/${id}`,
+      {
+        complete: false,
       },
-    })
-    console.log(response);
+      {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      }
+    );
+    //console.log(response);
 
     // switch list to done
-    let todoWrapper = document.getElementById(`taskCheckbox-${id}`).parentElement;
+    let todoWrapper = document.getElementById(
+      `taskCheckbox-${id}`
+    ).parentElement;
     document.getElementById("completeWrapper").removeChild(todoWrapper);
     document.getElementById("tasksWrapper").appendChild(todoWrapper);
-    
+
     tasksNum++;
     completesNum--;
-    updateCounter()
+    updateCounter();
   } catch (error) {
-    console.log("make uncomplete ", error)
+    console.log("make uncomplete ", error);
   }
 }
 
-
 async function deleteToDo(id) {
-  console.log("del", id);
+  //console.log("del", id);
   try {
-    const response = await axios.delete(`${API}/todo/${id}`, 
-    { 
-        headers: {
-          "Authorization": "Bearer " + token,
-        }
+    const response = await axios.delete(`${API}/todo/${id}`, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
     });
-  
-    console.log(response)
+
+
+    //console.log(response)
+
     // delete view
-    let todoWrapper = document.getElementById(`taskCheckbox-${id}`).parentElement;
+    let todoWrapper = document.getElementById(
+      `taskCheckbox-${id}`
+    ).parentElement;
     todoWrapper.parentElement.removeChild(todoWrapper);
-    if(response.data && response.data.deletedTodo.complete){
+    if (response.data && response.data.deletedTodo.complete) {
       completesNum--;
-    }else{
+    } else {
       tasksNum--;
     }
-    updateCounter()
+    updateCounter();
   } catch (error) {
-    console.log("delete ", error)
+    console.log("delete ", error);
   }
 }
 
 // dynamically create task to be shown in one of the both lists
 function makeTask(data) {
-
   // lists of todos and completed todos
-  let allTasksWrapper = document.getElementById('tasksWrapper');
-  let completeTaskWrapper = document.getElementById('completeWrapper');
+  let allTasksWrapper = document.getElementById("tasksWrapper");
+  let completeTaskWrapper = document.getElementById("completeWrapper");
 
   // one todo item
   var taskWrapper = document.createElement("div");
@@ -285,22 +323,25 @@ function makeTask(data) {
   checkbox.id = `taskCheckbox-${toDoElementId}`;
   checkbox.name = `taskCheckbox-${toDoElementId}`;
   checkbox.checked = data.complete ? true : false;
-  checkbox.addEventListener('change', function () {
+  checkbox.addEventListener("change", function () {
     if (this.checked) {
-      makeComplete(data.id)
+      makeComplete(data.id);
     } else {
-      makeUncomplete(data.id)
+      makeUncomplete(data.id);
     }
   });
 
-
   // label to show todo item task
   let text = document.createElement("label");
-  text.classList.add(data.complete ? "taskText"+"taskChecked" : "taskText");
+  //console.log("data.complete", data.complete);
+  if (data.complete) {
+    text.classList.add("taskText", "taskChecked");
+  } else {
+    text.classList.add("taskText");
+  }
   text.id = `taskCheckbox`;
   text.htmlFor = `taskCheckbox-${toDoElementId}`;
   text.innerHTML = data.text;
-
 
   // dateTime to show date and time, made from date and time fields
   let dateTime = document.createElement("div");
@@ -312,13 +353,12 @@ function makeTask(data) {
   date.classList.add("taskDate");
   time.classList.add("taskTime");
 
-  let dateDisplay = data.date.split("-")
+  let dateDisplay = data.date.split("-");
   date.innerHTML = `📆 ${dateDisplay[2]}.${dateDisplay[1]}.${dateDisplay[0]}`;
   time.innerHTML = "🕐 " + data.time;
 
   dateTime.appendChild(date);
   dateTime.appendChild(time);
-
 
   // delete-button
   let deleteButton = document.createElement("button");
@@ -328,8 +368,7 @@ function makeTask(data) {
     deleteToDo(data.id);
   };
 
-
-  // add created elements 
+  // add created elements
   taskWrapper.appendChild(checkbox);
   taskWrapper.appendChild(text);
   taskWrapper.appendChild(dateTime);
