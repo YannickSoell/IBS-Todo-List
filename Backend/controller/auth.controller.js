@@ -39,10 +39,10 @@ exports.login = async (req, res) => {
 exports.oauthRender = async (req, res) => {
   res.render("oauthform");
 };
-//https://3b0e7f286fb5.ngrok.io
+
 exports.oauthLogin = async (req, res) => {
   const { email, password } = req.body;
-  console.log(email, password);
+  //console.log(email, password);
   if (!email || !password) {
     return res.status(422).send({ error: "Must provide email and password" });
   }
@@ -52,30 +52,23 @@ exports.oauthLogin = async (req, res) => {
   }
   try {
     await user.comparePassword(password);
-    const token = jwt.sign({ email: email }, "MY_SECRET_KEY");
 
-    await Code.updateOne(
-      { userId: user._id },
-      { code: token },
-      { upsert: true }
-    );
-
-    const code = await Code.findOne({ userId: user._id });
-    console.log("CODE ", code);
-
-    res.send({ code: code });
+    const token = jwt.sign({ userId: user._id }, "MY_SECRET_KEY");
+    console.log("TOKEN ", token);
+    res.send({ access_token: token });
   } catch (err) {
     return res.status(422).send({ error: "Invalid Password or Email" });
   }
 };
-exports.oauthAccessToken = async (req, res) => {
+/* exports.oauthAccessToken = async (req, res) => {
   try {
     console.log("req ", req);
     console.log(req.body);
     const urlCode = new URL("http://dummy?" + req.body).searchParams.get(
       "code"
     );
-    const code = await Code.findOne({ code: urlcode });
+
+    const code = await Code.findOne({ code: urlCode });
 
     if (code) {
       const user = await User.find({ _id: code.userId });
@@ -90,3 +83,4 @@ exports.oauthAccessToken = async (req, res) => {
     res.status(500).send(e);
   }
 };
+ */
