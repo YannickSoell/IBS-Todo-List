@@ -41,9 +41,13 @@ npm install
   - [ ] Email einkommentieren
 - [x] start own mqtt server for frontend
 - [x] POST Todo mit Alexa
+- [ ] Code kommentieren und durchschauen
+- [ ] Video aufnehmen
+- [ ] Dokumentation
 
 ### Alexa-Skill
 
 - [x] intents
-- [ ] Auth with Alexa
-- [ ] heutige todos: ist oder sind mit und beim letzen | Text verbessern...
+- [x] Auth with Alexa
+- [x] heutige todos: ist oder sind mit und beim letzen | Text verbessern...
+- [x] Realtime frontend add a todo

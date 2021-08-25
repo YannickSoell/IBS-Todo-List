@@ -60,6 +60,18 @@ exports.oauthLogin = async (req, res) => {
     return res.status(422).send({ error: "Invalid Password or Email" });
   }
 };
+
+exports.getuserId = async (req, res) => {
+  try {
+    if (req.user) {
+      res.send({ uid: req.user });
+    }
+  } catch (error) {
+    console.log("ERROR GET USERID", error);
+    res.status(500).send({ error: "Server error get User Id" });
+  }
+};
+
 /* exports.oauthAccessToken = async (req, res) => {
   try {
     console.log("req ", req);

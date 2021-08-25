@@ -52,7 +52,9 @@ window.onload = async function () {
   if (token) {
     modal.style.display = "none";
     console.log("Auth BEARER TOKEN : ", token);
-    m = new mqtt_fetch("todo");
+    let userId = await getUid();
+    console.log("userid", userId);
+    m = new mqtt_fetch("todo", userId);
     //https://www.ostalbradar.de/node/alexa2mqtt.js?user=6447
 
     await m.init("localhost", 1884); // MQTT over websockets!!
@@ -61,6 +63,15 @@ window.onload = async function () {
     getAllTodos();
   }
 };
+
+async function getUid() {
+  const response = await axios.get(`${API}/uid`, {
+    headers: {
+      Authorization: "Bearer " + token,
+    },
+  });
+  return response.data.uid;
+}
 
 function mqttTodo(data) {
   let jsondata = JSON.parse(data);
@@ -284,7 +295,6 @@ async function deleteToDo(id) {
         Authorization: "Bearer " + token,
       },
     });
-
 
     //console.log(response)
 

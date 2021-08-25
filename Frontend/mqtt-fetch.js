@@ -4,12 +4,13 @@
 */
 
 class mqtt_fetch {
-  constructor(prefix) {
+  constructor(prefix, userId) {
     this.prefix = "mqttfetch/" + prefix + "/";
     this.mqtt_topicIndex = 0;
     this.mqtt_topicMap = new Map();
     this.timeout = 1000;
     this.qos = 0;
+    this.userId = userId;
     console.log("Ende Konstruktor ");
   }
 
@@ -39,7 +40,7 @@ class mqtt_fetch {
         host,
         port,
         uri,
-        "token-" + localStorage.getItem("authToken")
+        "uid-" + that.userId
       );
       that.mqtt_client.onMessageArrived = function (msg) {
         that.mqtt_fetch_rx(msg, that);

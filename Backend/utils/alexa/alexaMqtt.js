@@ -2,6 +2,9 @@ const mqtt = require("mqtt");
 const cache = require("memory-cache");
 const mongoose = require("mongoose");
 const Todo = mongoose.model("Todo");
+const jwt = require("jsonwebtoken");
+const moment = require("moment");
+
 /* Backend-URL fuer Alexa-Skill:
  https://www.ostalbradar.de/node/alexa2mqtt.js?user=6447 //user = canvas-ID
 */
@@ -33,12 +36,15 @@ module.exports = function () {
     var flag = false;
     var todos;
     var sessionId = alexaOBJ.session.sessionId;
+    var token = alexaOBJ.session.user.accessToken;
     //var intents = ["gettodo","maketodo","todotext", "tododate", "todotime"];
-
+    var payload = jwt.verify(token, "MY_SECRET_KEY");
+    var { userId } = payload;
+    //console.log("UserId ", userId);
     // Session
     if (alexaOBJ.session.new) {
       userSession = {
-        userId: "",
+        userId: userId,
         zustand: 0,
         todoText: "",
         todoDate: "",
@@ -71,63 +77,87 @@ module.exports = function () {
           userSession.zustand = 1;
           break;
         case 1:
-          responseNummer = 1;
+          const today = moment().format("YYYY-MM-DD");
           todosArray = await Todo.find(
             {
-              userId: mongoose.Types.ObjectId("60d3d406af9d656d3164ff9d"),
-              complete: false,
+              userId: userSession.userId,
+              $and: [{ datum: today }, { complete: false }],
             },
             { _id: 0, text: 1 }
           ).sort({
             created_at: -1,
           });
-          //HIER NICHT DIE GANZE DOCUMENT ZURÜCK GEBEN !!!!
-          todos = todosArray.map((e) => e.text).join(", ");
-          //console.log(todosArray);
+          let todosArrayMapped = todosArray.map((e) => e.text);
+          switch (todosArray.length) {
+            case 0:
+              responseNummer = 3;
+              break;
+            case 1:
+              responseNummer = 2;
+              todos = todosArrayMapped;
+              break;
+            default:
+              responseNummer = 1;
+              todos =
+                todosArrayMapped.slice(0, -1).join(", ") +
+                " und " +
+                todosArrayMapped.slice(-1);
+              break;
+          }
           break;
         case 2:
-          responseNummer = 2;
+          responseNummer = 4;
           userSession.zustand = 3;
           break;
         case 3:
-          if (intent == "todotext") {
+          if (
+            intent == "todotext" &&
+            alexaOBJ.request.intent.slots.text.value
+          ) {
             userSession.todoText = alexaOBJ.request.intent.slots.text.value;
-            responseNummer = 3;
+            responseNummer = 5;
             userSession.zustand = 4;
           } else {
-            responseNummer = 2;
+            responseNummer = 4;
           }
           break;
         case 4:
-          if (intent == "tododate") {
+          if (
+            intent == "tododate" &&
+            alexaOBJ.request.intent.slots.date.value
+          ) {
             userSession.todoDate = alexaOBJ.request.intent.slots.date.value;
-            responseNummer = 4;
+            responseNummer = 6;
             userSession.zustand = 5;
           } else {
-            responseNummer = 3;
+            responseNummer = 5;
           }
           break;
         case 5:
-          if (intent == "todotime") {
+          if (
+            intent == "todotime" &&
+            alexaOBJ.request.intent.slots.time.value
+          ) {
             userSession.todoTime = alexaOBJ.request.intent.slots.time.value;
-            responseNummer = 5;
+            responseNummer = 7;
             flag = true;
             console.log("userSession", userSession);
-            console.log(typeof userSession.todoDate);
+            //console.log(typeof userSession.todoDate);
             const todo = new Todo({
-              userId: mongoose.Types.ObjectId("60d3d406af9d656d3164ff9d"),
+              userId: userSession.userId,
               text: userSession.todoText,
               datum: userSession.todoDate,
               time: userSession.todoTime,
               complete: false,
             });
             await todo.save();
+            console.log(`mqttfetch/todo/uid-${userSession.userId}/to/-1`);
             clientJs.publish(
-              "mqttfetch/todo/token-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MGQzZDQwNmFmOWQ2NTZkMzE2NGZmOWQiLCJpYXQiOjE2MjUxODI2NTh9.r1n2wk39UX1fvg5SzDvdV2RW5iefcLByB-lrtvUYKgE/to/-1",
+              `mqttfetch/todo/uid-${userSession.userId}/to/-1`,
               JSON.stringify(todo)
             );
           } else {
-            responseNummer = 4;
+            responseNummer = 6;
           }
           break;
       }
@@ -142,8 +172,10 @@ module.exports = function () {
         */
 
     var responses = [
-      `Willkommen zurück bei deiner To do List. Was möchtest du machen, die heute fälligen To dos vorlesen oder ein neues To do erstellen?`,
-      `Deine heutige todos sind ${todos}.`,
+      `Willkommen zurück bei deiner To do List. Was möchtest du machen, die heute fälligen To do's vorlesen oder ein neues To do erstellen?`,
+      `Deine heutigen To do's sind ${todos}.`,
+      `Dein einziges heute fälliges To Do ist ${todos}.`,
+      `Heute sind keine To do's fällig.`,
       `Was möchtest du erledigen?`,
       `Ok. An welchem Tag möchtest du das machen?`,
       `Alles klar. Und um wie viel Uhr?`,
@@ -170,7 +202,7 @@ module.exports = function () {
       version: "1.0",
     };
 
-    console.log(topic, "" + message);
+    //console.log(topic, "" + message);
     client.publish(topic.replace("fr", "to"), JSON.stringify(response));
     clientJs.publish("mqttfetch/todo/+/to/+", JSON.stringify({ boy: "Hello" }));
   }
