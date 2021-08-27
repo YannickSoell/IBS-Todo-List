@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
-const url = require("url");
 const User = mongoose.model("User");
-const Code = mongoose.model("Code");
 const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
@@ -71,28 +69,3 @@ exports.getuserId = async (req, res) => {
     res.status(500).send({ error: "Server error get User Id" });
   }
 };
-
-/* exports.oauthAccessToken = async (req, res) => {
-  try {
-    console.log("req ", req);
-    console.log(req.body);
-    const urlCode = new URL("http://dummy?" + req.body).searchParams.get(
-      "code"
-    );
-
-    const code = await Code.findOne({ code: urlCode });
-
-    if (code) {
-      const user = await User.find({ _id: code.userId });
-      const token = jwt.sign({ userId: user._id }, "MY_SECRET_KEY");
-      console.log("CODE TOKEN ", code, token);
-      res.send({ access_token: token, token_type: "bearer" });
-    } else {
-      res.status(500).send({ error: "CODE NOT FOUND" });
-    }
-  } catch (e) {
-    console.log("ACCES TOKEN OAUTH ERROR", e);
-    res.status(500).send(e);
-  }
-};
- */

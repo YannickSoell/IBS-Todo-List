@@ -6,14 +6,18 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true,
     required: true,
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
-
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      "Please fill a valid email address",
+    ],
   },
   password: {
     type: String,
     required: true,
-  }
+  },
 });
+
+//Before save a new User, should hash the password with salt
 
 userSchema.pre("save", function (next) {
   const user = this;
@@ -35,6 +39,8 @@ userSchema.pre("save", function (next) {
     });
   });
 });
+
+// A function to compare the user password with a given password
 
 userSchema.methods.comparePassword = function (candidatepassword) {
   const user = this;

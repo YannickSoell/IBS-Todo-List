@@ -1,17 +1,22 @@
+/*
+ Version: 1.0
+ Author: Yannick Söll & Ali Karami
+*/
+
 //INPUTFIELD FOR TODOS
 let todoTextInput;
 let todoDateInput;
 let todoTimeInput;
 
-//COUNTERFIELDS FOR TODOS
-let taskNum;
-let completeNum;
+//COUNTER-FIELDS FOR TODOS
+let tasksNumOutput;
+let completesNumOutput;
 
 //LOGIN
 let loginButton;
 let loginText;
 let signupText;
-let signupState = false; //check if signup or signin
+let isStateSignup = false;
 let emailInput, passwordInput;
 let modal;
 
@@ -24,12 +29,14 @@ let tasksNum = 0;
 let completesNum = 0;
 
 window.onload = async function () {
+  // get the todo HTML Elements
   todoTextInput = document.getElementById("todoInput");
   todoDateInput = document.getElementById("dateInput");
   todoTimeInput = document.getElementById("timeInput");
-  completeNum = document.getElementById("completeNum");
-  taskNum = document.getElementById("taskNum");
-  // set defaultdate to current day
+  completesNumOutput = document.getElementById("completeNum");
+  tasksNumOutput = document.getElementById("taskNum");
+
+  // set default date of new todo to current day
   let date = new Date();
   let day = date.getDate();
   let month = date.getMonth() + 1;
@@ -39,6 +46,7 @@ window.onload = async function () {
   let today = year + "-" + month + "-" + day;
   todoDateInput.defaultValue = today;
 
+  // get the login/signup HTML Elements
   modal = document.getElementById("myModal");
   emailInput = document.getElementById("email");
   passwordInput = document.getElementById("password");
@@ -48,14 +56,12 @@ window.onload = async function () {
   document.getElementById("submitButton").addEventListener("click", addTodo);
   document.getElementById("loginButton").addEventListener("click", login);
 
+  // if already logged in, don't display login/signup window, init mqtt and fetch todos
   token = localStorage.getItem("authToken");
   if (token) {
     modal.style.display = "none";
-    console.log("Auth BEARER TOKEN : ", token);
     let userId = await getUid();
-    console.log("userid", userId);
     m = new mqtt_fetch("todo", userId);
-    //https://www.ostalbradar.de/node/alexa2mqtt.js?user=6447
 
     await m.init("localhost", 1884); // MQTT over websockets!!
     m.set_callback(-1, mqttTodo, false);
@@ -64,6 +70,7 @@ window.onload = async function () {
   }
 };
 
+// get user id
 async function getUid() {
   const response = await axios.get(`${API}/uid`, {
     headers: {
@@ -73,9 +80,9 @@ async function getUid() {
   return response.data.uid;
 }
 
+// fetch a todo over mqtt (when todo gets added using alexa)
 function mqttTodo(data) {
   let jsondata = JSON.parse(data);
-  console.log("mqttTodo ", jsondata);
 
   makeTask({
     id: jsondata._id,
@@ -93,23 +100,20 @@ function mqttTodo(data) {
 }
 
 function addTodo(e) {
-  // console.log(todoTextInput.value);
-  // console.log(todoDateInput.value);
-  // console.log(todoTimeInput.value);
-
   e.preventDefault();
 }
 
+// switch between displaying login or signup window
 function signup() {
-  if (!signupState) {
-    signupState = true;
+  if (!isStateSignup) {
+    isStateSignup = true;
     loginButton.value = "Signup";
     loginText.classList.remove("changeModeButton");
     loginText.classList.add("signupButton");
     signupText.classList.remove("signupButton");
     signupText.classList.add("changeModeButton");
   } else {
-    signupState = false;
+    isStateSignup = false;
     loginButton.value = "Login";
     loginText.classList.remove("signupButton");
     loginText.classList.add("changeModeButton");
@@ -118,16 +122,17 @@ function signup() {
   }
 }
 
+// logout, will delete authToken from local storage
 function logout() {
   localStorage.removeItem("authToken");
   location.reload();
 }
 
+// perform login or signup, store the auth token delivered by backend in local storage
 async function login(e) {
-  //HIER ANFRAGE SCHICKEN ZUM EINLOGGEN UND WENN ERFOLGREICH STYLE NONE
   let res;
   try {
-    if (signupState) {
+    if (isStateSignup) {
       res = await axios.post(`${API}/register`, {
         email: emailInput.value,
         password: passwordInput.value,
@@ -138,19 +143,18 @@ async function login(e) {
         password: passwordInput.value,
       });
     }
-    //console.log(res.data.token);
     if (res.data.token && res.data.token.length > 0) {
       localStorage.setItem("authToken", res.data.token);
       modal.style.display = "none";
       location.reload();
     }
   } catch (error) {
-    console.log("Error login", error);
+    console.log("Login error: ", error);
   }
-
   e.preventDefault();
 }
 
+// fetch all saved todos (when loading the page)
 async function getAllTodos() {
   try {
     const response = await axios.get(`${API}/todo`, {
@@ -158,7 +162,6 @@ async function getAllTodos() {
         Authorization: "Bearer " + token,
       },
     });
-    console.log("GET ALL TODOS", response.data.todos);
     let todos = response.data.todos;
     tasksNum = 0;
     completesNum = 0;
@@ -178,17 +181,20 @@ async function getAllTodos() {
     });
     updateCounter();
   } catch (error) {
-    console.log("GET ALL TODOS", error);
+    console.log("Get all todos error: ", error);
   }
 }
 
+// display the change of todo numbers in HTML element
 function updateCounter() {
-  taskNum.innerHTML = tasksNum;
-  completeNum.innerHTML = completesNum;
+  tasksNumOutput.innerHTML = tasksNum;
+  completesNumOutput.innerHTML = completesNum;
 }
 
+// create a new task, send it to backend and display it locally
 async function submit() {
   try {
+    // send the new task to backend
     const response = await axios.post(
       `${API}/todo`,
       {
@@ -202,8 +208,8 @@ async function submit() {
         },
       }
     );
-    //console.log(response);
 
+    // display the new task locally
     makeTask({
       id: response.data._id,
       text: response.data.text,
@@ -217,13 +223,14 @@ async function submit() {
     tasksNum++;
     updateCounter();
   } catch (error) {
-    console.log(error);
+    console.log("Submit error: ", error);
   }
 }
 
+// mark task as complete, send update to backend and display the change locally (switching lists)
 async function makeComplete(id) {
-  //console.log("com", id);
   try {
+    // send completed status of task to backend
     const response = await axios.put(
       `${API}/todo/${id}`,
       {
@@ -235,9 +242,8 @@ async function makeComplete(id) {
         },
       }
     );
-    //console.log(response);
 
-    // switch list to done
+    // switch the list of the task to the done list
     let todoWrapper = document.getElementById(
       `taskCheckbox-${id}`
     ).parentElement;
@@ -248,17 +254,19 @@ async function makeComplete(id) {
       compWrapper.firstChild.nextSibling.nextSibling
     );
 
+    // display the change in counter numbers
     tasksNum--;
     completesNum++;
     updateCounter();
   } catch (error) {
-    console.log("make complete ", error);
+    console.log("Make complete error: ", error);
   }
 }
 
+// mark task as uncomplete, send update to backend and display the change locally (switching lists)
 async function makeUncomplete(id) {
-  //console.log("ucom", id);
   try {
+    // send uncomplete status of task to backend
     const response = await axios.put(
       `${API}/todo/${id}`,
       {
@@ -270,35 +278,34 @@ async function makeUncomplete(id) {
         },
       }
     );
-    //console.log(response);
 
-    // switch list to done
+    // switch the list of the task to the tasks list
     let todoWrapper = document.getElementById(
       `taskCheckbox-${id}`
     ).parentElement;
     document.getElementById("completeWrapper").removeChild(todoWrapper);
     document.getElementById("tasksWrapper").appendChild(todoWrapper);
 
+    // display the change in counter numbers
     tasksNum++;
     completesNum--;
     updateCounter();
   } catch (error) {
-    console.log("make uncomplete ", error);
+    console.log("Make uncomplete error:", error);
   }
 }
 
+// delete a todo, send update to backend and display the change locally (removing from its list)
 async function deleteToDo(id) {
-  //console.log("del", id);
   try {
+    // send delted status to backend
     const response = await axios.delete(`${API}/todo/${id}`, {
       headers: {
         Authorization: "Bearer " + token,
       },
     });
 
-    //console.log(response)
-
-    // delete view
+    // delete the local view of the deleted element in its list and update the counter of the list
     let todoWrapper = document.getElementById(
       `taskCheckbox-${id}`
     ).parentElement;
@@ -310,11 +317,13 @@ async function deleteToDo(id) {
     }
     updateCounter();
   } catch (error) {
-    console.log("delete ", error);
+    console.log("Delete error: ", error);
   }
 }
 
 // dynamically create task to be shown in one of the both lists
+// called when adding a task and also when fetching tasks from backend
+// thus needing to add to both lists (todos and completed todos)
 function makeTask(data) {
   // lists of todos and completed todos
   let allTasksWrapper = document.getElementById("tasksWrapper");
@@ -343,7 +352,6 @@ function makeTask(data) {
 
   // label to show todo item task
   let text = document.createElement("label");
-  //console.log("data.complete", data.complete);
   if (data.complete) {
     text.classList.add("taskText", "taskChecked");
   } else {
@@ -378,12 +386,13 @@ function makeTask(data) {
     deleteToDo(data.id);
   };
 
-  // add created elements
+  // add created elements to taskWrapper
   taskWrapper.appendChild(checkbox);
   taskWrapper.appendChild(text);
   taskWrapper.appendChild(dateTime);
   taskWrapper.appendChild(deleteButton);
 
+  // depending on completion status, add the task to the appropriate list
   if (data.complete) {
     completeTaskWrapper.appendChild(taskWrapper);
   } else {

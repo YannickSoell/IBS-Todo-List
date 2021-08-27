@@ -1,36 +1,26 @@
-var nodemailer = require('nodemailer');
-
+var nodemailer = require("nodemailer");
+//nodemailer is for email notifaction and sending. We use a new Google mail adress
 var transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
-    user: 'ibstodo@gmail.com',
-    pass: 'HS-Aalen#4'
-  }
+    user: "ibstodo@gmail.com",
+    pass: "HS-Aalen#4",
+  },
 });
 
-
-/* function template(text) {
-
-} */
-
 module.exports = function sendMail(email, text, subject) {
-    //TODO: template(text);
-    var mailOptions = {
-      from: '"IBS-Todo" <ibstodo@gmail.com>',
-      to: email,
-      subject: subject,
-      text: text.join(),
-    };
-
-    //console.log("Hallo", mailOptions)
-  
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log("error" + error);
-      } else {
-        console.log("Email sent: " + info.response);
-      }
-    });
+  var mailOptions = {
+    from: '"IBS-Todo" <ibstodo@gmail.com>',
+    to: email,
+    subject: subject,
+    text: text.join(),
   };
-  
 
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log("error" + error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+};

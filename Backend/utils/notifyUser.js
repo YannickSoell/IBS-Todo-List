@@ -33,28 +33,14 @@ async function findTodoSendEmail() {
     },
   ]);
 
-  //console.log("todos ", todos)
-
   todos.forEach(async (todo) => {
-    //TODO: Auskommentieren
+    //Function sendMail(email, text, subject)
     //sendMail(todo.email[0], todo.todoText, `Heute ${todo.count} fällig!`)
   });
-
-  //sendMail(/*emial, text, subject*/)
 }
 
 module.exports = function notifyUser() {
+  //Find todos of today and send email notification to user with a Time Interval
   findTodoSendEmail();
   setInterval(findTodoSendEmail, delay);
 };
-
-// mongo
-// _id: 60dcac088236ec24708cad66
-// complete: false
-// userId: 60d4617f6905e51c64b69d71
-// text: "test"
-// datum: "2021-06-30"
-// time: "09:00"
-// created_at: 2021-06-30T17:38:16.126+00:00
-// updatedAt: 2021-06-30T17:38:16.126+00:00
-// __v: 0

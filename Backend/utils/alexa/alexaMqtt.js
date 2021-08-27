@@ -9,6 +9,16 @@ const moment = require("moment");
  https://www.ostalbradar.de/node/alexa2mqtt.js?user=6447 //user = canvas-ID
 */
 
+/*
+  Alexa Commands:
+  
+  1. die heute fälligen todos vorlesen
+  2. ein neues todo erstellen
+    2.a ich möchte {text}
+    2.b Am {date}
+    2.c Um {time}
+*/
+
 module.exports = function () {
   var userId = "6447"; // Canvas User-ID
 
@@ -36,11 +46,11 @@ module.exports = function () {
     var flag = false;
     var todos;
     var sessionId = alexaOBJ.session.sessionId;
+    //Accesstoken for signedin user
     var token = alexaOBJ.session.user.accessToken;
-    //var intents = ["gettodo","maketodo","todotext", "tododate", "todotime"];
     var payload = jwt.verify(token, "MY_SECRET_KEY");
     var { userId } = payload;
-    //console.log("UserId ", userId);
+
     // Session
     if (alexaOBJ.session.new) {
       userSession = {
@@ -69,7 +79,7 @@ module.exports = function () {
       cache.del(sessionId);
     }
 
-    /* AUTOMATE */
+    /* AUTOMATE with 5 states*/
     if (userSession.zustand != null) {
       switch (userSession.zustand) {
         case 0:
@@ -213,9 +223,9 @@ module.exports = function () {
     client = mqtt.connect(connectOptions).on("connect", function () {
       console.log("mqtt connected");
       client.on("message", onMessage);
-      client.subscribe("mqttfetch/alexa2mqtt/" + 6447 + "/fr/+"); // canvas-ID
+      client.subscribe("mqttfetch/alexa2mqtt/" + 6447 + "/fr/+");
     });
-    //mqtt://127.0.0.1 für Frontend
+    //mqtt Server for Frontend. To send new Todos on Frontend
     clientJs = mqtt
       .connect("ws://localhost:1884", {})
       .on("connect", function () {

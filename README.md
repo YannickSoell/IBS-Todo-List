@@ -4,6 +4,8 @@ A simple Todo-List
 
 ### Frontend
 
+open todo.html
+
 - [x] Config
 - [x] Auth
 - [x] Designen und implementieren
@@ -23,6 +25,16 @@ Have to install npm packages
 ```
 npm install
 
+npm start
+
+```
+
+open new Terminal and run this command
+We need ngrok for Alexa OAuth
+
+```
+ngrok http 9998
+
 ```
 
 - [x] Config
@@ -37,11 +49,10 @@ npm install
 - [ ] Email Notification
   - [x] Nodemailer with Gmail service
   - [x] Timerinterval for everyday
-  - [ ] template
   - [ ] Email einkommentieren
 - [x] start own mqtt server for frontend
 - [x] POST Todo mit Alexa
-- [ ] Code kommentieren und durchschauen
+- [x] Code kommentieren und durchschauen
 - [ ] Video aufnehmen
 - [ ] Dokumentation
 

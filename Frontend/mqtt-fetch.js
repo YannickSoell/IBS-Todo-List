@@ -36,6 +36,7 @@ class mqtt_fetch {
       connect_prm.password = "RPo6zINUyveBhOrQ0gFmT9Yvrp0"; */
 
       console.log(connect_prm);
+      // Edited! we need to add the user Id in the mqtt adress
       that.mqtt_client = new Paho.MQTT.Client(
         host,
         port,
