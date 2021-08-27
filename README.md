@@ -46,10 +46,10 @@ ngrok http 9998
   - [x] PUT Todo
   - [x] DELETE Todo
 - [x] MQTT
-- [ ] Email Notification
+- [x] Email Notification
   - [x] Nodemailer with Gmail service
   - [x] Timerinterval for everyday
-  - [ ] Email einkommentieren
+  - [x] Email einkommentieren
 - [x] start own mqtt server for frontend
 - [x] POST Todo mit Alexa
 - [x] Code kommentieren und durchschauen

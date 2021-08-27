@@ -35,7 +35,7 @@ async function findTodoSendEmail() {
 
   todos.forEach(async (todo) => {
     //Function sendMail(email, text, subject)
-    //sendMail(todo.email[0], todo.todoText, `Heute ${todo.count} fällig!`)
+    sendMail(todo.email[0], todo.todoText, `Heute ${todo.count} fällig!`);
   });
 }
 
