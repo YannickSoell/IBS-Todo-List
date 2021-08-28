@@ -114,6 +114,7 @@ module.exports = function () {
                 todosArrayMapped.slice(-1);
               break;
           }
+          flag = true;
           break;
         case 2:
           responseNummer = 4;

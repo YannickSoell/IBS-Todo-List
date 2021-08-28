@@ -17,7 +17,7 @@ const path = require("path");
 const authRoute = require("./route/authRoute");
 const todoRoute = require("./route/todoRoute");
 const notifyUser = require("./utils/notifyUser");
-const alexaMqtt = require("./utils/alexa/alexaMqtt")();
+const alexaMqtt = require("./alexa/alexaMqtt")();
 const app = express();
 
 //Express Configuration

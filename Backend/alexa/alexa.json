@@ -1,7 +1,7 @@
 {
     "interactionModel": {
         "languageModel": {
-            "invocationName": "todo list",
+            "invocationName": "internetbasierte systeme todo list",
             "intents": [
                 {
                     "name": "gettodo",
@@ -26,7 +26,7 @@
                         }
                     ],
                     "samples": [
-                        "ich möchte {text}"
+                        "Ich möchte {text}"
                     ]
                 },
                 {
