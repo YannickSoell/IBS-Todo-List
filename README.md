@@ -2,7 +2,7 @@
 
 A simple Todo-List with REST API and Mqtt connection
 
-![Todolist](screenshot/sc1.png?raw=true "Main Page")
+![Todolist](screenshots/sc1.png "Main Page")
 
 
 ### Frontend
