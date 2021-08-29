@@ -5,6 +5,7 @@ const User = mongoose.model("User");
 const moment = require("moment");
 
 const today = moment().format("YYYY-MM-DD");
+//Delay 86400000 sec = 1 day
 const delay = 86400000;
 
 async function findTodoSendEmail() {
