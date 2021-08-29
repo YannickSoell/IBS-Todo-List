@@ -56,8 +56,8 @@ ngrok http 9998
 - [x] start own mqtt server for frontend
 - [x] POST Todo mit Alexa
 - [x] Code kommentieren und durchschauen
-- [ ] Video aufnehmen
-- [ ] Dokumentation
+- [x] Video aufnehmen
+- [x] Dokumentation
 
 ### Alexa-Skill
 
